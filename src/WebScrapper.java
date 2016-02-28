@@ -26,8 +26,10 @@ public class WebScrapper {
         // Retrieve the whole web page given the URL
         HtmlPage page = webClient.getPage("http://www.morningstar.se/Funds/Quickrank.aspx?cb=on");
 
+        Boolean stop = false;
+
         // Loop to iterate until there's no "next page". Using XPath to select the "next page" button
-        while (page.getByXPath("/html/body/form/div[4]/div[4]/div[2]/div[9]/table/tfoot/tr/td/a[15]") != null) {
+        while (page.getByXPath("/html/body/form/div[4]/div[4]/div[2]/div[9]/table/tfoot/tr/td/a[15]") != null || !stop) {
 
             // Get the table where the data is by Id
             HtmlTable table = page.getHtmlElementById("ctl01_cphContent_Quickrank1_ctl00");
@@ -35,6 +37,11 @@ public class WebScrapper {
             // Get the body of the table
             for (HtmlTableBody body : table.getBodies()) {
                 List<HtmlTableRow> rows = body.getRows();
+
+                System.out.println("NUMBER OF ROWS: " + rows.size());
+                if (rows.size() < 20) {
+                    stop = true;
+                }
 
                 // Loop to iterate through all the rows in each page
                 for (HtmlTableRow row : rows) {
